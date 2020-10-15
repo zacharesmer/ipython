@@ -29,9 +29,8 @@ scan Python source code and re-emit it with no changes to its original
 formatting (which is the hard part).
 """
 
-__all__ = ['ANSICodeColors', 'Parser']
+__all__ = ['Parser']
 
-_scheme_default = 'Linux'
 
 
 # Imports
@@ -43,7 +42,7 @@ import tokenize
 
 generate_tokens = tokenize.generate_tokens
 
-from IPython.utils.coloransi import TermColors, InputTermColors,ColorScheme, ColorSchemeTable
+from IPython.utils.coloransi import TermColors, InputTermColors,ColorScheme, ColorSchemeTable, make_color_table
 from .colorable import Colorable
 from io import StringIO
 
@@ -56,143 +55,6 @@ _TEXT    = token.NT_OFFSET + 2
 
 #****************************************************************************
 # Builtin color schemes
-
-Colors = TermColors  # just a shorthand
-
-# Build a few color schemes
-NoColor = ColorScheme(
-    'NoColor',{
-    'header'         : Colors.NoColor,
-    token.NUMBER     : Colors.NoColor,
-    token.OP         : Colors.NoColor,
-    token.STRING     : Colors.NoColor,
-    tokenize.COMMENT : Colors.NoColor,
-    token.NAME       : Colors.NoColor,
-    token.ERRORTOKEN : Colors.NoColor,
-
-    _KEYWORD         : Colors.NoColor,
-    _TEXT            : Colors.NoColor,
-
-    'in_prompt'      : InputTermColors.NoColor,  # Input prompt
-    'in_number'      : InputTermColors.NoColor,  # Input prompt number
-    'in_prompt2'     : InputTermColors.NoColor, # Continuation prompt
-    'in_normal'      : InputTermColors.NoColor,  # color off (usu. Colors.Normal)
-
-    'out_prompt'     : Colors.NoColor, # Output prompt
-    'out_number'     : Colors.NoColor, # Output prompt number
-
-    'normal'         : Colors.NoColor  # color off (usu. Colors.Normal)
-    }  )
-
-LinuxColors = ColorScheme(
-    'Linux',{
-    'header'         : Colors.LightRed,
-    token.NUMBER     : Colors.LightCyan,
-    token.OP         : Colors.Yellow,
-    token.STRING     : Colors.LightBlue,
-    tokenize.COMMENT : Colors.LightRed,
-    token.NAME       : Colors.Normal,
-    token.ERRORTOKEN : Colors.Red,
-
-    _KEYWORD         : Colors.LightGreen,
-    _TEXT            : Colors.Yellow,
-
-    'in_prompt'      : InputTermColors.Green,
-    'in_number'      : InputTermColors.LightGreen,
-    'in_prompt2'     : InputTermColors.Green,
-    'in_normal'      : InputTermColors.Normal,  # color off (usu. Colors.Normal)
-
-    'out_prompt'     : Colors.Red,
-    'out_number'     : Colors.LightRed,
-
-    'normal'         : Colors.Normal  # color off (usu. Colors.Normal)
-    } )
-
-MonokaiColors = ColorScheme(
-    "Monokai",
-    {
-        "header": Colors.MonokaiYellow,
-        token.NUMBER: Colors.MonokaiPurple,
-        token.OP: Colors.MonokaiRed,
-        token.STRING: Colors.MonokaiOrange,
-        tokenize.COMMENT: Colors.MonokaiGray,
-        token.NAME: Colors.Normal,
-        token.ERRORTOKEN: Colors.MonokaiRed,
-        _KEYWORD: Colors.MonokaiGreen,
-        _TEXT: Colors.MonokaiOrange,
-        "in_prompt": InputTermColors.MonokaiGreen,
-        "in_number": InputTermColors.MonokaiCyan,
-        "in_prompt2": InputTermColors.MonokaiGreen,
-        "in_normal": InputTermColors.Normal,  # color off (usu. Colors.Normal)
-        "out_prompt": Colors.MonokaiRed,
-        "out_number": Colors.MonokaiMagenta,
-        "normal": Colors.Normal,  # color off (usu. Colors.Normal)
-    },
-)
-
-NeutralColors = ColorScheme(
-    'Neutral',{
-    'header'         : Colors.Red,
-    token.NUMBER     : Colors.Cyan,
-    token.OP         : Colors.Blue,
-    token.STRING     : Colors.Blue,
-    tokenize.COMMENT : Colors.Red,
-    token.NAME       : Colors.Normal,
-    token.ERRORTOKEN : Colors.Red,
-
-    _KEYWORD         : Colors.Green,
-    _TEXT            : Colors.Blue,
-
-    'in_prompt'      : InputTermColors.Blue,
-    'in_number'      : InputTermColors.LightBlue,
-    'in_prompt2'     : InputTermColors.Blue,
-    'in_normal'      : InputTermColors.Normal,  # color off (usu. Colors.Normal)
-
-    'out_prompt'     : Colors.Red,
-    'out_number'     : Colors.LightRed,
-
-    'normal'         : Colors.Normal  # color off (usu. Colors.Normal)
-    }  )
-
-# Hack: the 'neutral' colours are not very visible on a dark background on
-# Windows. Since Windows command prompts have a dark background by default, and
-# relatively few users are likely to alter that, we will use the 'Linux' colours,
-# designed for a dark background, as the default on Windows. Changing it here
-# avoids affecting the prompt colours rendered by prompt_toolkit, where the
-# neutral defaults do work OK.
-
-if os.name == 'nt':
-    NeutralColors = LinuxColors.copy(name='Neutral')
-
-LightBGColors = ColorScheme(
-    'LightBG',{
-    'header'         : Colors.Red,
-    token.NUMBER     : Colors.Cyan,
-    token.OP         : Colors.Blue,
-    token.STRING     : Colors.Blue,
-    tokenize.COMMENT : Colors.Red,
-    token.NAME       : Colors.Normal,
-    token.ERRORTOKEN : Colors.Red,
-
-
-    _KEYWORD         : Colors.Green,
-    _TEXT            : Colors.Blue,
-
-    'in_prompt'      : InputTermColors.Blue,
-    'in_number'      : InputTermColors.LightBlue,
-    'in_prompt2'     : InputTermColors.Blue,
-    'in_normal'      : InputTermColors.Normal,  # color off (usu. Colors.Normal)
-
-    'out_prompt'     : Colors.Red,
-    'out_number'     : Colors.LightRed,
-
-    'normal'         : Colors.Normal  # color off (usu. Colors.Normal)
-    }  )
-
-# Build table of color schemes (needed by the parser)
-ANSICodeColors = ColorSchemeTable(
-    [NoColor, LinuxColors, LightBGColors, NeutralColors, MonokaiColors], _scheme_default
-)
 
 Undefined = object()
 
@@ -207,8 +69,8 @@ class Parser(Colorable):
         """
 
         super(Parser, self).__init__(parent=parent)
-
-        self.color_table = color_table if color_table else ANSICodeColors
+        self.build_colors(justUpdate=False)
+        self.color_table = color_table if color_table else self.ANSICodeColors
         self.out = out
         self.pos = None
         self.lines = None
@@ -218,6 +80,150 @@ class Parser(Colorable):
         else:
             self.style = style
 
+    def build_colors(self, justUpdate=False):
+        _scheme_default = 'Linux'
+
+        Colors = TermColors  # just a shorthand
+
+        UserColors = ColorScheme(
+            "User",
+            {
+                "header": Colors.UserHeader,
+                token.NUMBER: Colors.UserNUMBER,
+                token.OP: Colors.UserOP,
+                token.STRING: Colors.UserSTRING,
+                tokenize.COMMENT: Colors.UserCOMMENT,
+                token.NAME: Colors.UserNAME,
+                token.ERRORTOKEN: Colors.UserERRORTOKEN,
+                _KEYWORD: Colors.User_KEYWORD,
+                _TEXT: Colors.User_TEXT,
+                "in_prompt": InputTermColors.UserInPrompt,
+                "in_number": InputTermColors.UserInNumber,
+                "in_prompt2": InputTermColors.UserInPrompt2,
+                "in_normal": InputTermColors.UserNormal,  # color off (usu. Colors.Normal)
+                "out_prompt": Colors.UserOutPrompt,
+                "out_number": Colors.UserOutNumber,
+                "normal": Colors.UserNormal,  # color off (usu. Colors.Normal)
+            },
+        )
+
+        if justUpdate:
+            #shortened function if the color table is already built
+            self.color_table.add_scheme(UserColors)
+            return
+
+        # Build a few color schemes
+        NoColor = ColorScheme(
+            'NoColor',{
+            'header'         : Colors.NoColor,
+            token.NUMBER     : Colors.NoColor,
+            token.OP         : Colors.NoColor,
+            token.STRING     : Colors.NoColor,
+            tokenize.COMMENT : Colors.NoColor,
+            token.NAME       : Colors.NoColor,
+            token.ERRORTOKEN : Colors.NoColor,
+
+            _KEYWORD         : Colors.NoColor,
+            _TEXT            : Colors.NoColor,
+
+            'in_prompt'      : InputTermColors.NoColor,  # Input prompt
+            'in_number'      : InputTermColors.NoColor,  # Input prompt number
+            'in_prompt2'     : InputTermColors.NoColor, # Continuation prompt
+            'in_normal'      : InputTermColors.NoColor,  # color off (usu. Colors.Normal)
+
+            'out_prompt'     : Colors.NoColor, # Output prompt
+            'out_number'     : Colors.NoColor, # Output prompt number
+
+            'normal'         : Colors.NoColor  # color off (usu. Colors.Normal)
+            }  )
+
+        LinuxColors = ColorScheme(
+            'Linux',{
+            'header'         : Colors.LightRed,
+            token.NUMBER     : Colors.LightCyan,
+            token.OP         : Colors.Yellow,
+            token.STRING     : Colors.LightBlue,
+            tokenize.COMMENT : Colors.LightRed,
+            token.NAME       : Colors.Normal,
+            token.ERRORTOKEN : Colors.Red,
+
+            _KEYWORD         : Colors.LightGreen,
+            _TEXT            : Colors.Yellow,
+
+            'in_prompt'      : InputTermColors.Green,
+            'in_number'      : InputTermColors.LightGreen,
+            'in_prompt2'     : InputTermColors.Green,
+            'in_normal'      : InputTermColors.Normal,  # color off (usu. Colors.Normal)
+
+            'out_prompt'     : Colors.Red,
+            'out_number'     : Colors.LightRed,
+
+            'normal'         : Colors.Normal  # color off (usu. Colors.Normal)
+            } )
+
+        NeutralColors = ColorScheme(
+            'Neutral',{
+            'header'         : Colors.Red,
+            token.NUMBER     : Colors.Cyan,
+            token.OP         : Colors.Blue,
+            token.STRING     : Colors.Blue,
+            tokenize.COMMENT : Colors.Red,
+            token.NAME       : Colors.Normal,
+            token.ERRORTOKEN : Colors.Red,
+
+            _KEYWORD         : Colors.Green,
+            _TEXT            : Colors.Blue,
+
+            'in_prompt'      : InputTermColors.Blue,
+            'in_number'      : InputTermColors.LightBlue,
+            'in_prompt2'     : InputTermColors.Blue,
+            'in_normal'      : InputTermColors.Normal,  # color off (usu. Colors.Normal)
+
+            'out_prompt'     : Colors.Red,
+            'out_number'     : Colors.LightRed,
+
+            'normal'         : Colors.Normal  # color off (usu. Colors.Normal)
+            }  )
+
+        # Hack: the 'neutral' colours are not very visible on a dark background on
+        # Windows. Since Windows command prompts have a dark background by default, and
+        # relatively few users are likely to alter that, we will use the 'Linux' colours,
+        # designed for a dark background, as the default on Windows. Changing it here
+        # avoids affecting the prompt colours rendered by prompt_toolkit, where the
+        # neutral defaults do work OK.
+
+        if os.name == 'nt':
+            NeutralColors = LinuxColors.copy(name='Neutral')
+
+        LightBGColors = ColorScheme(
+            'LightBG',{
+            'header'         : Colors.Red,
+            token.NUMBER     : Colors.Cyan,
+            token.OP         : Colors.Blue,
+            token.STRING     : Colors.Blue,
+            tokenize.COMMENT : Colors.Red,
+            token.NAME       : Colors.Normal,
+            token.ERRORTOKEN : Colors.Red,
+
+
+            _KEYWORD         : Colors.Green,
+            _TEXT            : Colors.Blue,
+
+            'in_prompt'      : InputTermColors.Blue,
+            'in_number'      : InputTermColors.LightBlue,
+            'in_prompt2'     : InputTermColors.Blue,
+            'in_normal'      : InputTermColors.Normal,  # color off (usu. Colors.Normal)
+
+            'out_prompt'     : Colors.Red,
+            'out_number'     : Colors.LightRed,
+
+            'normal'         : Colors.Normal  # color off (usu. Colors.Normal)
+            }  )
+
+        # Build table of color schemes
+        self.ANSICodeColors = ColorSchemeTable(
+            [NoColor, LinuxColors, LightBGColors, NeutralColors, UserColors], _scheme_default
+        )
 
     def format(self, raw, out=None, scheme=Undefined):
         import warnings

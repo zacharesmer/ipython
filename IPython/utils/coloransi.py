@@ -15,55 +15,82 @@ import os
 
 from IPython.utils.ipstruct import Struct
 
-color_templates = (
-    # Dark colors
-    ("Black", "0;30"),
-    ("Red", "0;31"),
-    ("Green", "0;32"),
-    ("Brown", "0;33"),
-    ("Blue", "0;34"),
-    ("Purple", "0;35"),
-    ("Cyan", "0;36"),
-    ("LightGray", "0;37"),
-    # Light colors
-    ("DarkGray", "1;30"),
-    ("LightRed", "1;31"),
-    ("LightGreen", "1;32"),
-    ("Yellow", "1;33"),
-    ("LightBlue", "1;34"),
-    ("LightPurple", "1;35"),
-    ("LightCyan", "1;36"),
-    ("White", "1;37"),
-    # Blinking colors.  Probably should not be used in anything serious.
-    ("BlinkBlack", "5;30"),
-    ("BlinkRed", "5;31"),
-    ("BlinkGreen", "5;32"),
-    ("BlinkYellow", "5;33"),
-    ("BlinkBlue", "5;34"),
-    ("BlinkPurple", "5;35"),
-    ("BlinkCyan", "5;36"),
-    ("BlinkLightGray", "5;37"),
-    # Monokai colors
-    ("MonokaiGray", "38;5;242"),
-    ("MonokaiRed", "38;5;197"),
-    ("MonokaiGreen", "38;5;148"),
-    ("MonokaiOrange", "38;5;214"),
-    ("MonokaiBlue", "38;5;75"),
-    ("MonokaiPurple", "38;5;141"),
-    ("MonokaiMagenta", "38;5;207"),
-    ("MonokaiCyan", "38;5;159"),
-    ("MonokaiYellow", "38;5;228"),
-)
+class ColorTemplates():
+    builtin_templates = (
+        # Dark colors
+        ("Black", "0;30"),
+        ("Red", "0;31"),
+        ("Green", "0;32"),
+        ("Brown", "0;33"),
+        ("Blue", "0;34"),
+        ("Purple", "0;35"),
+        ("Cyan", "0;36"),
+        ("LightGray", "0;37"),
+        # Light colors
+        ("DarkGray", "1;30"),
+        ("LightRed", "1;31"),
+        ("LightGreen", "1;32"),
+        ("Yellow", "1;33"),
+        ("LightBlue", "1;34"),
+        ("LightPurple", "1;35"),
+        ("LightCyan", "1;36"),
+        ("White", "1;37"),
+        # Blinking colors.  Probably should not be used in anything serious.
+        ("BlinkBlack", "5;30"),
+        ("BlinkRed", "5;31"),
+        ("BlinkGreen", "5;32"),
+        ("BlinkYellow", "5;33"),
+        ("BlinkBlue", "5;34"),
+        ("BlinkPurple", "5;35"),
+        ("BlinkCyan", "5;36"),
+        ("BlinkLightGray", "5;37"),
+    )
+    user_templates = (
+        ("UserDebugPrompt",         "38;5;0"),
+        ("UserBreakpointEnabled",   "38;5;0"),
+        ("UserBreakpointDisabled",  "38;5;0"),
+        ("UserTopline",     "38;5;0"),
+        ("UserFilename",    "38;5;0"),
+        ("UserLineno",      "38;5;0"),
+        ("UserName",        "38;5;0"),
+        ("UservName",       "38;5;0"),
+        ("UserVal",         "38;5;0"),
+        ("UserEm",          "38;5;0"),
+        ("UserNormalEm",    "38;5;0"),
+        ("UserFilenameEm",  "38;5;0"),
+        ("UserLinenoEm",    "38;5;0"),
+        ("UserNameEm",      "38;5;0"),
+        ("UserValEm",       "38;5;0"),
+        ("UserExcName",     "38;5;0"),
+        ("UserLine",        "38;5;0"),
+        ("UserCaret",       "38;5;0"),
+        ("UserNormal",      "38;5;0"),
+        ("UserHeader",      "38;5;0"),
+        ("UserNUMBER",      "38;5;205"),
+        ("UserOP",          "38;5;205"),
+        ("UserSTRING",      "38;5;205"),
+        ("UserCOMMENT",     "38;5;205"),
+        ("UserNAME",        "38;5;205"),
+        ("UserERRORTOKEN",  "38;5;205"),
+        ("User_KEYWORD",    "38;5;205"),
+        ("User_TEXT",       "38;5;205"),
+        ("UserInPrompt",    "38;5;0"),
+        ("UserInNumber",    "38;5;0"),
+        ("UserInPrompt2",   "38;5;0"),
+        ("UserOutPrompt",   "38;5;0"),
+        ("UserOutNumber",   "38;5;0"),
+    )
+   
 
-
-def make_color_table(in_class):
+def make_color_table():
     """Build a set of color attributes in a class.
 
     Helper function for building the :class:`TermColors` and
     :class`InputTermColors`.
     """
-    for name,value in color_templates:
-        setattr(in_class,name,in_class._base % value)
+    for in_class in (TermColors, InputTermColors):
+        for name,value in ColorTemplates().builtin_templates + ColorTemplates().user_templates:
+            setattr(in_class,name,in_class._base % value)
 
 class TermColors:
     """Color escape sequences.
@@ -78,9 +105,6 @@ class TermColors:
     NoColor = ''  # for color schemes in color-less terminals.
     Normal = '\033[0m'   # Reset normal coloring
     _base  = '\033[%sm'  # Template for all other colors
-
-# Build the actual color table as a set of class attributes:
-make_color_table(TermColors)
 
 class InputTermColors:
     """Color escape sequences for input prompts.
@@ -108,7 +132,7 @@ class InputTermColors:
         _base  = '\001\033[%sm\002'  # Template for all other colors
 
 # Build the actual color table as a set of class attributes:
-make_color_table(InputTermColors)
+make_color_table()
 
 class NoColors:
     """This defines all the same names as the colour classes, but maps them to
@@ -116,7 +140,7 @@ class NoColors:
     NoColor = ''
     Normal  = ''
 
-for name, value in color_templates:
+for name, value in ColorTemplates().builtin_templates + ColorTemplates().user_templates:
     setattr(NoColors, name, '')
 
 class ColorScheme:

@@ -250,6 +250,22 @@ class Pdb(OldPdb):
 
         # Create color table: we copy the default one from the traceback
         # module and add a few attributes needed for debugging
+        self.update_colors()
+
+        # Add a python parser so we can syntax highlight source while
+        # debugging.
+        self.parser = PyColorize.Parser(style=color_scheme)
+        self.set_colors(color_scheme)
+
+        # Set the prompt - the default prompt is '(Pdb)'
+        self.prompt = prompt
+        self.skip_hidden = True
+
+    def update_colors(self):
+        """Initialize or re-make the color scheme table
+          and apply values from the config file."""
+        # Create color table: we copy the default one from the traceback
+        # module and add a few attributes needed for debugging
         self.color_scheme_table = exception_colors()
 
         # shorthands
@@ -272,18 +288,11 @@ class Pdb(OldPdb):
         cst["Neutral"].colors.breakpoint_enabled = C.LightRed
         cst["Neutral"].colors.breakpoint_disabled = C.Red
 
-        cst["Monokai"].colors.prompt = C.MonokaiBlue
-        cst["Monokai"].colors.breakpoint_enabled = C.MonokaiMagenta
-        cst["Monokai"].colors.breakpoint_disabled = C.MonokaiRed
-
-        # Add a python parser so we can syntax highlight source while
-        # debugging.
-        self.parser = PyColorize.Parser(style=color_scheme)
-        self.set_colors(color_scheme)
-
-        # Set the prompt - the default prompt is '(Pdb)'
-        self.prompt = prompt
-        self.skip_hidden = True
+        cst["User"].colors.prompt = C.UserDebugPrompt
+        cst["User"].colors.breakpoint_enabled = C.UserBreakpointEnabled
+        cst["User"].colors.breakpoint_disabled = C.UserBreakpointDisabled
+        if hasattr('self', 'parser'):
+            self.parser.build_colors(justUpdate=True)
 
     def set_colors(self, scheme):
         """Shorthand access to the color table scheme selector method."""

@@ -433,9 +433,9 @@ class InteractiveShell(SingletonConfigurable):
         """
     ).tag(config=True)
     colors = CaselessStrEnum(
-        ("Neutral", "NoColor", "LightBG", "Linux", "Monokai"),
+        ("Neutral", "NoColor", "LightBG", "Linux", "User"),
         default_value="Neutral",
-        help="Set the color scheme (NoColor, Neutral, Linux, Monokai, or LightBG).",
+        help="Set the color scheme (NoColor, Neutral, Linux, User, or LightBG).",
     ).tag(config=True)
     debug = Bool(False).tag(config=True)
     disable_failing_post_execute = Bool(False,
@@ -840,7 +840,6 @@ class InteractiveShell(SingletonConfigurable):
     def init_inspector(self, changes=None):
         # Object inspector
         self.inspector = oinspect.Inspector(oinspect.InspectColors,
-                                            PyColorize.ANSICodeColors,
                                             self.colors,
                                             self.object_info_string_level)
 

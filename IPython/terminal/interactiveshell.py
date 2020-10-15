@@ -13,7 +13,7 @@ from IPython.utils.terminal import toggle_set_term_title, set_term_title, restor
 from IPython.utils.process import abbrev_cwd
 from traitlets import (
     Bool, Unicode, Dict, Integer, observe, Instance, Type, default, Enum, Union,
-    Any, validate
+    Any, validate, Tuple
 )
 
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
@@ -39,6 +39,8 @@ from .prompts import Prompts, ClassicPrompts, RichPromptDisplayHook
 from .ptutils import IPythonPTCompleter, IPythonPTLexer
 from .shortcuts import create_ipython_shortcuts
 
+from IPython.utils.coloransi import ColorTemplates, make_color_table
+
 DISPLAY_BANNER_DEPRECATED = object()
 PTK3 = ptk_version.startswith('3.')
 
@@ -61,12 +63,6 @@ _style_overrides_linux = {
             Token.OutPromptNum: '#ansired bold',
 }
 
-_style_overrides_monokai = {
-    Token.Prompt: "#6c99bb",  # blue
-    Token.PromptNum: "#6c99bb bold",
-    Token.OutPrompt: "#afd700",  # green
-    Token.OutPromptNum: "#afd700 bold",
-}
 
 def get_default_editor():
     try:
@@ -202,6 +198,24 @@ class TerminalInteractiveShell(InteractiveShell):
         help="Override highlighting format for specific tokens"
     ).tag(config=True)
 
+    user_color_templates = Tuple(ColorTemplates.user_templates,
+        help=("Change the color cordes to configure " 
+              " traceback and debugging colors. See " 
+              " https://en.wikipedia.org/wiki/ANSI_escape_code#Colors "
+              " for information about the color codes used. IPython adds the "
+              " ESC[ and m that surround the values here. ")
+    ).tag(config=True)
+    @observe('user_color_templates')
+    def _update_color_templates(self, change):
+        ColorTemplates.user_templates = change["new"]
+        make_color_table()
+        if hasattr('self', 'InteractiveTB'):
+            self.InteractiveTB.update_colors()
+        if hasattr('self', 'SyntaxTB'):
+            self.SyntaxTB.update_colors()
+        if hasattr('self', 'Inspector'):
+            self.inspector
+    
     true_color = Bool(False,
         help=("Use 24bit colors instead of 256 colors in prompt highlighting. "
               "If your terminal supports true color, the following command "
@@ -346,7 +360,7 @@ class TerminalInteractiveShell(InteractiveShell):
         if name_or_cls == 'legacy':
             legacy = self.colors.lower()
             if legacy == 'linux':
-                style_cls = get_style_by_name('monokai')
+                style_cls = get_style_by_name('default')
                 style_overrides = _style_overrides_linux
             elif legacy == 'lightbg':
                 style_overrides = _style_overrides_light_bg
@@ -382,11 +396,11 @@ class TerminalInteractiveShell(InteractiveShell):
             elif legacy =='nocolor':
                 style_cls=_NoStyle
                 style_overrides = {}
+            elif legacy == 'user':
+                style_cls=get_style_by_name('monokai')
+                style_overrides = {}
             else:
                 raise ValueError("Got unknown colors: ", legacy)
-        elif name_or_cls == "monokai":
-            style_overrides = _style_overrides_monokai
-            style_cls = get_style_by_name("monokai")
         else:
             if isinstance(name_or_cls, str):
                 style_cls = get_style_by_name(name_or_cls)

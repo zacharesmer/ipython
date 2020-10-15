@@ -20,7 +20,7 @@ available_themes = lambda: [s for s in pygments.styles.get_all_styles()] + [
     "LightBG",
     "Linux",
     "Neutral",
-    "Monokai",
+    "User",
 ]
 
 

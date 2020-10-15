@@ -70,9 +70,6 @@ ColorSchemeTable class. Currently the following exist:
   - Neutral: a neutral color scheme that should be readable on both light and
     dark background
 
-  - Monokai: a color scheme that takes advantage of 256-bit colors. Best on 
-    a dark background.
-
 You can implement other color schemes easily, the syntax is fairly
 self-explanatory. Please send back new schemes you develop to the author for
 possible inclusion in future releases.
@@ -82,7 +79,6 @@ Inheritance diagram:
 .. inheritance-diagram:: IPython.core.ultratb
    :parts: 3
 """
-
 #*****************************************************************************
 # Copyright (C) 2001 Nathaniel Gray <n8gray@caltech.edu>
 # Copyright (C) 2001-2004 Fernando Perez <fperez@colorado.edu>
@@ -195,11 +191,7 @@ class TBTools(colorable.Colorable):
         # subclasses can simply access self.ostream for writing.
         self._ostream = ostream
 
-        # Create color table
-        self.color_scheme_table = exception_colors()
-
-        self.set_colors(color_scheme)
-        self.old_scheme = color_scheme  # save initial value for toggles
+        self.update_colors()
 
         if call_pdb:
             self.pdb = debugger.Pdb()
@@ -263,6 +255,17 @@ class TBTools(colorable.Colorable):
         # Also set colors of debugger
         if hasattr(self, 'pdb') and self.pdb is not None:
             self.pdb.set_colors(*args, **kw)
+
+    def update_colors(self, color_scheme='NoColor'):
+        """Initialize or re-make the color scheme table 
+           and apply values from the config file."""
+        # Create or re-create color table
+        self.color_scheme_table = exception_colors()
+
+        self.set_colors(color_scheme)
+        self.old_scheme = color_scheme  # save initial value for toggles
+        if hasattr(self, 'pdb') and self.pdb is not None:
+            self.pdb.update_colors()
 
     def color_toggle(self):
         """Toggle between the currently active color scheme and NoColor."""

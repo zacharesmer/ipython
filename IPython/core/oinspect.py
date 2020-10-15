@@ -64,7 +64,7 @@ _builtin_meth_type = type(str.upper)  # Bound methods have the same type as buil
 
 Colors = TermColors  # just a shorthand
 
-InspectColors = PyColorize.ANSICodeColors
+InspectColors = PyColorize.Parser().ANSICodeColors
 
 #****************************************************************************
 # Auxiliary functions and objects
@@ -354,7 +354,6 @@ def find_source_lines(obj):
 class Inspector(Colorable):
 
     def __init__(self, color_table=InspectColors,
-                 code_color_table=PyColorize.ANSICodeColors,
                  scheme=None,
                  str_detail_level=0,
                  parent=None, config=None):
@@ -379,6 +378,11 @@ class Inspector(Colorable):
         """Return a header string with proper colors."""
         return '%s%s%s' % (self.color_table.active_colors.header,h,
                            self.color_table.active_colors.normal)
+
+    def update_colors(self):
+        """Update the color table to load values from config file"""
+        self.color_table = PyColorize.Parser().ANSICodeColors
+        
 
     def set_active_scheme(self, scheme):
         if scheme is not None:

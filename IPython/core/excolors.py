@@ -20,7 +20,7 @@ def exception_colors():
     """Return a color table with fields for exception reporting.
 
     The table is an instance of ColorSchemeTable with schemes added for
-    'Neutral', 'Linux', 'LightBG', 'Monokai', and 'NoColor' and fields for exception handling filled
+    'Neutral', 'Linux', 'LightBG', 'User', and 'NoColor' and fields for exception handling filled
     in.
 
     Examples:
@@ -157,27 +157,27 @@ def exception_colors():
     # For dark background and 256-bit colors
     ex_colors.add_scheme(
         ColorScheme(
-            "Monokai",
+            "User",
             # The color to be used for the top line
-            topline=C.MonokaiRed,
+            topline=C.UserTopline,
             # The colors to be used in the traceback
-            filename=C.MonokaiCyan,
-            lineno=C.MonokaiGray,
-            name=C.MonokaiPurple,
-            vName=C.MonokaiGreen,
-            val=C.MonokaiGreen,
-            em=C.MonokaiCyan,
+            filename=C.UserFilename,
+            lineno=C.UserLineno,
+            name=C.UserName,
+            vName=C.UservName,
+            val=C.UserVal,
+            em=C.UserEm,
             # Emphasized colors for the last frame of the traceback
-            normalEm=C.MonokaiCyan,
-            filenameEm=C.MonokaiGreen,
-            linenoEm=C.MonokaiGray,
-            nameEm=C.MonokaiPurple,
-            valEm=C.MonokaiBlue,
+            normalEm=C.UserNormalEm,
+            filenameEm=C.UserFilenameEm,
+            linenoEm=C.UserLinenoEm,
+            nameEm=C.UserNameEm,
+            valEm=C.UserValEm,
             # Colors for printing the exception
-            excName=C.MonokaiRed,
-            line=C.MonokaiRed,
-            caret=C.MonokaiBlue,
-            Normal=C.Normal,
+            excName=C.UserExcName,
+            line=C.UserLine,
+            caret=C.UserCaret,
+            Normal=C.UserNormal,
         )
     )
 
