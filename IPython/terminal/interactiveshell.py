@@ -13,7 +13,7 @@ from IPython.utils.terminal import toggle_set_term_title, set_term_title, restor
 from IPython.utils.process import abbrev_cwd
 from traitlets import (
     Bool, Unicode, Dict, Integer, observe, Instance, Type, default, Enum, Union,
-    Any, validate, Tuple
+    Any, validate, List
 )
 
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
@@ -198,7 +198,10 @@ class TerminalInteractiveShell(InteractiveShell):
         help="Override highlighting format for specific tokens"
     ).tag(config=True)
 
-    user_color_templates = Tuple(ColorTemplates.user_templates,
+   
+    user_color_templates = List(list(ColorTemplates.user_templates),
+        # casting to a list is necessary because traitlets cannot
+        # parse a nested tuple into a string for the config file
         help=("Change the color cordes to configure " 
               " traceback and debugging colors. See " 
               " https://en.wikipedia.org/wiki/ANSI_escape_code#Colors "
@@ -207,7 +210,7 @@ class TerminalInteractiveShell(InteractiveShell):
     ).tag(config=True)
     @observe('user_color_templates')
     def _update_color_templates(self, change):
-        ColorTemplates.user_templates = change["new"]
+        ColorTemplates.user_templates = tuple(change["new"])
         make_color_table()
     
     true_color = Bool(False,
