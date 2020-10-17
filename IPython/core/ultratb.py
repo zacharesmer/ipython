@@ -191,7 +191,7 @@ class TBTools(colorable.Colorable):
         # subclasses can simply access self.ostream for writing.
         self._ostream = ostream
 
-        # Create or re-create color table
+        # Create create color table
         self.color_scheme_table = exception_colors()
 
         self.set_colors(color_scheme)
