@@ -12,8 +12,19 @@ from IPython.utils.py3compat import input
 from IPython.utils.terminal import toggle_set_term_title, set_term_title, restore_term_title
 from IPython.utils.process import abbrev_cwd
 from traitlets import (
-    Bool, Unicode, Dict, Integer, observe, Instance, Type, default, Enum, Union,
-    Any, validate, List
+    Bool,
+    Unicode,
+    Dict,
+    Integer,
+    observe,
+    Instance,
+    Type,
+    default,
+    Enum,
+    Union,
+    Any,
+    validate,
+    List,
 )
 
 from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
@@ -198,26 +209,32 @@ class TerminalInteractiveShell(InteractiveShell):
         help="Override highlighting format for specific tokens"
     ).tag(config=True)
 
-   
-    user_color_templates = List(list(ColorTemplates.user_templates),
+    user_color_templates = List(
+        list(ColorTemplates.user_templates),
         # casting to a list is necessary because traitlets cannot
         # parse a nested tuple into a string for the config file
-        help=("Change the color cordes to configure " 
-              " traceback and debugging colors. See " 
-              " https://en.wikipedia.org/wiki/ANSI_escape_code#Colors "
-              " for information about the color codes used. IPython adds the "
-              " ESC[ and m that surround the values here. ")
+        help=(
+            "Change the color cordes to configure "
+            " traceback and debugging colors. See "
+            " https://en.wikipedia.org/wiki/ANSI_escape_code#Colors "
+            " for information about the color codes used. IPython adds the "
+            " ESC[ and m that surround the values here. "
+        ),
     ).tag(config=True)
-    @observe('user_color_templates')
+
+    @observe("user_color_templates")
     def _update_color_templates(self, change):
         ColorTemplates.user_templates = tuple(change["new"])
         make_color_table()
-    
-    true_color = Bool(False,
-        help=("Use 24bit colors instead of 256 colors in prompt highlighting. "
-              "If your terminal supports true color, the following command "
-              "should print 'TRUECOLOR' in orange: "
-              "printf \"\\x1b[38;2;255;100;0mTRUECOLOR\\x1b[0m\\n\"")
+
+    true_color = Bool(
+        False,
+        help=(
+            "Use 24bit colors instead of 256 colors in prompt highlighting. "
+            "If your terminal supports true color, the following command "
+            "should print 'TRUECOLOR' in orange: "
+            'printf "\\x1b[38;2;255;100;0mTRUECOLOR\\x1b[0m\\n"'
+        ),
     ).tag(config=True)
 
     editor = Unicode(get_default_editor(),
@@ -393,8 +410,8 @@ class TerminalInteractiveShell(InteractiveShell):
             elif legacy =='nocolor':
                 style_cls=_NoStyle
                 style_overrides = {}
-            elif legacy == 'user':
-                style_cls=_NoStyle
+            elif legacy == "user":
+                style_cls = _NoStyle
                 style_overrides = {}
             else:
                 raise ValueError("Got unknown colors: ", legacy)

@@ -15,7 +15,8 @@ import os
 
 from IPython.utils.ipstruct import Struct
 
-class ColorTemplates():
+
+class ColorTemplates:
     builtin_templates = (
         # Dark colors
         ("Black", "0;30"),
@@ -46,41 +47,41 @@ class ColorTemplates():
         ("BlinkLightGray", "5;37"),
     )
     user_templates = (
-        ("UserDebugPrompt",         "38;5;0"),
-        ("UserBreakpointEnabled",   "38;5;0"),
-        ("UserBreakpointDisabled",  "38;5;0"),
-        ("UserTopline",     "38;5;0"),
-        ("UserFilename",    "38;5;0"),
-        ("UserLineno",      "38;5;0"),
-        ("UserName",        "38;5;0"),
-        ("UservName",       "38;5;0"),
-        ("UserVal",         "38;5;0"),
-        ("UserEm",          "38;5;0"),
-        ("UserNormalEm",    "38;5;0"),
-        ("UserFilenameEm",  "38;5;0"),
-        ("UserLinenoEm",    "38;5;0"),
-        ("UserNameEm",      "38;5;0"),
-        ("UserValEm",       "38;5;0"),
-        ("UserExcName",     "38;5;0"),
-        ("UserLine",        "38;5;0"),
-        ("UserCaret",       "38;5;0"),
-        ("UserNormal",      "38;5;0"),
-        ("UserHeader",      "38;5;0"),
-        ("UserNUMBER",      "38;5;205"),
-        ("UserOP",          "38;5;205"),
-        ("UserSTRING",      "38;5;205"),
-        ("UserCOMMENT",     "38;5;205"),
-        ("UserNAME",        "38;5;205"),
-        ("UserERRORTOKEN",  "38;5;205"),
-        ("User_KEYWORD",    "38;5;205"),
-        ("User_TEXT",       "38;5;205"),
-        ("UserInPrompt",    "38;5;0"),
-        ("UserInNumber",    "38;5;0"),
-        ("UserInPrompt2",   "38;5;0"),
-        ("UserOutPrompt",   "38;5;0"),
-        ("UserOutNumber",   "38;5;0"),
+        ("UserDebugPrompt", "38;5;0"),
+        ("UserBreakpointEnabled", "38;5;0"),
+        ("UserBreakpointDisabled", "38;5;0"),
+        ("UserTopline", "38;5;0"),
+        ("UserFilename", "38;5;0"),
+        ("UserLineno", "38;5;0"),
+        ("UserName", "38;5;0"),
+        ("UservName", "38;5;0"),
+        ("UserVal", "38;5;0"),
+        ("UserEm", "38;5;0"),
+        ("UserNormalEm", "38;5;0"),
+        ("UserFilenameEm", "38;5;0"),
+        ("UserLinenoEm", "38;5;0"),
+        ("UserNameEm", "38;5;0"),
+        ("UserValEm", "38;5;0"),
+        ("UserExcName", "38;5;0"),
+        ("UserLine", "38;5;0"),
+        ("UserCaret", "38;5;0"),
+        ("UserNormal", "38;5;0"),
+        ("UserHeader", "38;5;0"),
+        ("UserNUMBER", "38;5;205"),
+        ("UserOP", "38;5;205"),
+        ("UserSTRING", "38;5;205"),
+        ("UserCOMMENT", "38;5;205"),
+        ("UserNAME", "38;5;205"),
+        ("UserERRORTOKEN", "38;5;205"),
+        ("User_KEYWORD", "38;5;205"),
+        ("User_TEXT", "38;5;205"),
+        ("UserInPrompt", "38;5;0"),
+        ("UserInNumber", "38;5;0"),
+        ("UserInPrompt2", "38;5;0"),
+        ("UserOutPrompt", "38;5;0"),
+        ("UserOutNumber", "38;5;0"),
     )
-   
+
 
 def make_color_table():
     """Build a set of color attributes in a class.
@@ -89,8 +90,11 @@ def make_color_table():
     :class`InputTermColors`.
     """
     for in_class in (TermColors, InputTermColors):
-        for name,value in ColorTemplates().builtin_templates + ColorTemplates().user_templates:
-            setattr(in_class,name,in_class._base % value)
+        for name, value in (
+            ColorTemplates().builtin_templates + ColorTemplates().user_templates
+        ):
+            setattr(in_class, name, in_class._base % value)
+
 
 class TermColors:
     """Color escape sequences.
