@@ -69,7 +69,7 @@ class Parser(Colorable):
         """
 
         super(Parser, self).__init__(parent=parent)
-        self.build_colors(justUpdate=False)
+        self.build_colors()
         self.color_table = color_table if color_table else self.ANSICodeColors
         self.out = out
         self.pos = None
@@ -80,37 +80,11 @@ class Parser(Colorable):
         else:
             self.style = style
 
-    def build_colors(self, justUpdate=False):
+    def build_colors(self):
         _scheme_default = 'Linux'
 
         Colors = TermColors  # just a shorthand
 
-        UserColors = ColorScheme(
-            "User",
-            {
-                "header": Colors.UserHeader,
-                token.NUMBER: Colors.UserNUMBER,
-                token.OP: Colors.UserOP,
-                token.STRING: Colors.UserSTRING,
-                tokenize.COMMENT: Colors.UserCOMMENT,
-                token.NAME: Colors.UserNAME,
-                token.ERRORTOKEN: Colors.UserERRORTOKEN,
-                _KEYWORD: Colors.User_KEYWORD,
-                _TEXT: Colors.User_TEXT,
-                "in_prompt": InputTermColors.UserInPrompt,
-                "in_number": InputTermColors.UserInNumber,
-                "in_prompt2": InputTermColors.UserInPrompt2,
-                "in_normal": InputTermColors.UserNormal,  # color off (usu. Colors.Normal)
-                "out_prompt": Colors.UserOutPrompt,
-                "out_number": Colors.UserOutNumber,
-                "normal": Colors.UserNormal,  # color off (usu. Colors.Normal)
-            },
-        )
-
-        if justUpdate:
-            #shortened function if the color table is already built
-            self.color_table.add_scheme(UserColors)
-            return
 
         # Build a few color schemes
         NoColor = ColorScheme(
@@ -219,6 +193,28 @@ class Parser(Colorable):
 
             'normal'         : Colors.Normal  # color off (usu. Colors.Normal)
             }  )
+
+        UserColors = ColorScheme(
+            "User",
+            {
+                "header": Colors.UserHeader,
+                token.NUMBER: Colors.UserNUMBER,
+                token.OP: Colors.UserOP,
+                token.STRING: Colors.UserSTRING,
+                tokenize.COMMENT: Colors.UserCOMMENT,
+                token.NAME: Colors.UserNAME,
+                token.ERRORTOKEN: Colors.UserERRORTOKEN,
+                _KEYWORD: Colors.User_KEYWORD,
+                _TEXT: Colors.User_TEXT,
+                "in_prompt": InputTermColors.UserInPrompt,
+                "in_number": InputTermColors.UserInNumber,
+                "in_prompt2": InputTermColors.UserInPrompt2,
+                "in_normal": InputTermColors.UserNormal,  # color off (usu. Colors.Normal)
+                "out_prompt": Colors.UserOutPrompt,
+                "out_number": Colors.UserOutNumber,
+                "normal": Colors.UserNormal,  # color off (usu. Colors.Normal)
+            },
+        )
 
         # Build table of color schemes
         self.ANSICodeColors = ColorSchemeTable(

@@ -379,11 +379,6 @@ class Inspector(Colorable):
         return '%s%s%s' % (self.color_table.active_colors.header,h,
                            self.color_table.active_colors.normal)
 
-    def update_colors(self):
-        """Update the color table to load values from config file"""
-        self.color_table = PyColorize.Parser().ANSICodeColors
-        
-
     def set_active_scheme(self, scheme):
         if scheme is not None:
             self.color_table.set_active_scheme(scheme)

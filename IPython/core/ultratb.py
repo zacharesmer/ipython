@@ -191,7 +191,11 @@ class TBTools(colorable.Colorable):
         # subclasses can simply access self.ostream for writing.
         self._ostream = ostream
 
-        self.update_colors()
+        # Create or re-create color table
+        self.color_scheme_table = exception_colors()
+
+        self.set_colors(color_scheme)
+        self.old_scheme = color_scheme  # save initial value for toggles
 
         if call_pdb:
             self.pdb = debugger.Pdb()
@@ -255,17 +259,6 @@ class TBTools(colorable.Colorable):
         # Also set colors of debugger
         if hasattr(self, 'pdb') and self.pdb is not None:
             self.pdb.set_colors(*args, **kw)
-
-    def update_colors(self, color_scheme='NoColor'):
-        """Initialize or re-make the color scheme table 
-           and apply values from the config file."""
-        # Create or re-create color table
-        self.color_scheme_table = exception_colors()
-
-        self.set_colors(color_scheme)
-        self.old_scheme = color_scheme  # save initial value for toggles
-        if hasattr(self, 'pdb') and self.pdb is not None:
-            self.pdb.update_colors()
 
     def color_toggle(self):
         """Toggle between the currently active color scheme and NoColor."""
@@ -741,7 +734,10 @@ class VerboseTB(TBTools):
         after = context // 2
         before = context - after
         if self.has_colors:
-            style = get_style_by_name('default')
+            if self.parent:
+                style = self.parent.highlighting_style
+            else:
+                style = get_style_by_name('default')
             style = stack_data.style_with_executing_node(style, 'bg:#00005f')
             formatter = Terminal256Formatter(style=style)
         else:

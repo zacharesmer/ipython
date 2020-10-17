@@ -209,12 +209,6 @@ class TerminalInteractiveShell(InteractiveShell):
     def _update_color_templates(self, change):
         ColorTemplates.user_templates = change["new"]
         make_color_table()
-        if hasattr('self', 'InteractiveTB'):
-            self.InteractiveTB.update_colors()
-        if hasattr('self', 'SyntaxTB'):
-            self.SyntaxTB.update_colors()
-        if hasattr('self', 'Inspector'):
-            self.inspector
     
     true_color = Bool(False,
         help=("Use 24bit colors instead of 256 colors in prompt highlighting. "
@@ -360,7 +354,7 @@ class TerminalInteractiveShell(InteractiveShell):
         if name_or_cls == 'legacy':
             legacy = self.colors.lower()
             if legacy == 'linux':
-                style_cls = get_style_by_name('default')
+                style_cls = get_style_by_name('monokai')
                 style_overrides = _style_overrides_linux
             elif legacy == 'lightbg':
                 style_overrides = _style_overrides_light_bg
@@ -397,7 +391,7 @@ class TerminalInteractiveShell(InteractiveShell):
                 style_cls=_NoStyle
                 style_overrides = {}
             elif legacy == 'user':
-                style_cls=get_style_by_name('monokai')
+                style_cls=_NoStyle
                 style_overrides = {}
             else:
                 raise ValueError("Got unknown colors: ", legacy)
