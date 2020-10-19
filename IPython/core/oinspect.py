@@ -64,7 +64,7 @@ _builtin_meth_type = type(str.upper)  # Bound methods have the same type as buil
 
 Colors = TermColors  # just a shorthand
 
-InspectColors = PyColorize.Parser().ANSICodeColors
+InspectColors = PyColorize.ANSICodeColors
 
 #****************************************************************************
 # Auxiliary functions and objects

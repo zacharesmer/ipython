@@ -841,7 +841,7 @@ class InteractiveShell(SingletonConfigurable):
         # Object inspector
         self.inspector = oinspect.Inspector(
             oinspect.InspectColors,
-            PyColorize.Parser().ANSICodeColors,
+            PyColorize.ANSICodeColors,
             self.colors,
             self.object_info_string_level,
         )
