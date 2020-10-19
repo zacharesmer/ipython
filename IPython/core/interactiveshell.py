@@ -759,6 +759,7 @@ class InteractiveShell(SingletonConfigurable):
         self.meta = Struct()
 
         # Temporary files used for various purposes.  Deleted at exit.
+        # The files here are stored with Path from Pathlib
         self.tempfiles = []
         self.tempdirs = []
 
@@ -2717,11 +2718,11 @@ class InteractiveShell(SingletonConfigurable):
             __future__ imports are not shared in either direction.
 
         """
-        fname = os.path.abspath(os.path.expanduser(fname))
+        fname = Path(fname).expanduser().resolve()
 
         # Make sure we can open the file
         try:
-            with open(fname):
+            with fname.open():
                 pass
         except:
             warn('Could not open file <%s> for safe execution.' % fname)
@@ -2730,7 +2731,7 @@ class InteractiveShell(SingletonConfigurable):
         # Find things also in current directory.  This is needed to mimic the
         # behavior of running a script from the system command line, where
         # Python inserts the script's directory into sys.path
-        dname = os.path.dirname(fname)
+        dname = str(fname.parent)
 
         with prepended_to_syspath(dname), self.builtin_trap:
             try:
@@ -2775,11 +2776,11 @@ class InteractiveShell(SingletonConfigurable):
         raise_exceptions : bool (False)
             If True raise exceptions everywhere.  Meant for testing.
         """
-        fname = os.path.abspath(os.path.expanduser(fname))
+        fname = Path(fname).expanduser().resolve()
 
         # Make sure we can open the file
         try:
-            with open(fname):
+            with fname.open():
                 pass
         except:
             warn('Could not open file <%s> for safe execution.' % fname)
@@ -2788,11 +2789,11 @@ class InteractiveShell(SingletonConfigurable):
         # Find things also in current directory.  This is needed to mimic the
         # behavior of running a script from the system command line, where
         # Python inserts the script's directory into sys.path
-        dname = os.path.dirname(fname)
-        
+        dname = str(fname.parent)
+
         def get_cells():
             """generator for sequence of code blocks to run"""
-            if fname.endswith('.ipynb'):
+            if fname.suffix == ".ipynb":
                 from nbformat import read
                 nb = read(fname, as_version=4)
                 if not nb.cells:
@@ -2801,8 +2802,7 @@ class InteractiveShell(SingletonConfigurable):
                     if cell.cell_type == 'code':
                         yield cell.source
             else:
-                with open(fname) as f:
-                    yield f.read()
+                yield fname.read_text()
 
         with prepended_to_syspath(dname):
             try:
@@ -3600,16 +3600,17 @@ class InteractiveShell(SingletonConfigurable):
           - data(None): if data is given, it gets written out to the temp file
             immediately, and the file is closed again."""
 
-        dirname = tempfile.mkdtemp(prefix=prefix)
-        self.tempdirs.append(dirname)
+        dir_path = Path(tempfile.mkdtemp(prefix=prefix))
+        self.tempdirs.append(dir_path)
 
-        handle, filename = tempfile.mkstemp('.py', prefix, dir=dirname)
+        handle, filename = tempfile.mkstemp(".py", prefix, dir=str(dir_path))
         os.close(handle)  # On Windows, there can only be one open handle on a file
-        self.tempfiles.append(filename)
+
+        file_path = Path(filename)
+        self.tempfiles.append(file_path)
 
         if data:
-            with open(filename, 'w') as tmp_file:
-                tmp_file.write(data)
+            file_path.write_text(data)
         return filename
 
     @undoc
@@ -3766,14 +3767,14 @@ class InteractiveShell(SingletonConfigurable):
         # Cleanup all tempfiles and folders left around
         for tfile in self.tempfiles:
             try:
-                os.unlink(tfile)
-            except OSError:
+                tfile.unlink()
+            except FileNotFoundError:
                 pass
 
         for tdir in self.tempdirs:
             try:
-                os.rmdir(tdir)
-            except OSError:
+                tdir.rmdir()
+            except FileNotFoundError:
                 pass
 
         # Clear all user namespaces to release all references cleanly.

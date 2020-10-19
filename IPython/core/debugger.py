@@ -293,7 +293,7 @@ class Pdb(OldPdb):
 
     def hidden_frames(self, stack):
         """
-        Given an index in the stack return wether it should be skipped.
+        Given an index in the stack return whether it should be skipped.
 
         This is used in up/down and where to skip frames.
         """
@@ -716,7 +716,9 @@ class Pdb(OldPdb):
                     break
             else:
                 # if no break occured.
-                self.error("all frames above hidden")
+                self.error(
+                    "all frames above hidden, use `skip_hidden False` to get get into those."
+                )
                 return
 
             Colors = self.color_scheme_table.active_colors
@@ -759,7 +761,9 @@ class Pdb(OldPdb):
                 if counter >= count:
                     break
             else:
-                self.error("all frames bellow hidden")
+                self.error(
+                    "all frames bellow hidden, use `skip_hidden False` to get get into those."
+                )
                 return
 
             Colors = self.color_scheme_table.active_colors

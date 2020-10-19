@@ -151,6 +151,11 @@ class TerminalInteractiveShell(InteractiveShell):
         help="Shortcut style to use at the prompt. 'vi' or 'emacs'.",
     ).tag(config=True)
 
+    emacs_bindings_in_vi_insert_mode = Bool(
+        True,
+        help="Add shortcuts from 'emacs' insert mode to 'vi' insert mode.",
+    ).tag(config=True)
+
     autoformatter = Unicode(None,
         help="Autoformatter to reformat Terminal code. Can be `'black'` or `None`",
         allow_none=True
@@ -227,14 +232,13 @@ class TerminalInteractiveShell(InteractiveShell):
         ColorTemplates.user_templates = tuple(change["new"])
         make_color_table()
 
-    true_color = Bool(
-        False,
-        help=(
-            "Use 24bit colors instead of 256 colors in prompt highlighting. "
-            "If your terminal supports true color, the following command "
-            "should print 'TRUECOLOR' in orange: "
-            'printf "\\x1b[38;2;255;100;0mTRUECOLOR\\x1b[0m\\n"'
-        ),
+    true_color = Bool(False,
+        help="""Use 24bit colors instead of 256 colors in prompt highlighting.
+        If your terminal supports true color, the following command should
+        print ``TRUECOLOR`` in orange::
+
+            printf \"\\x1b[38;2;255;100;0mTRUECOLOR\\x1b[0m\\n\"
+        """,
     ).tag(config=True)
 
     editor = Unicode(get_default_editor(),
