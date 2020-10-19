@@ -29,7 +29,7 @@ scan Python source code and re-emit it with no changes to its original
 formatting (which is the hard part).
 """
 
-__all__ = ["Parser"]
+__all__ = ["ANSICodeColors", "Parser"]
 
 
 # Imports
@@ -46,7 +46,6 @@ from IPython.utils.coloransi import (
     InputTermColors,
     ColorScheme,
     ColorSchemeTable,
-    make_color_table,
 )
 from .colorable import Colorable
 from io import StringIO
@@ -57,9 +56,6 @@ from io import StringIO
 
 _KEYWORD = token.NT_OFFSET + 1
 _TEXT    = token.NT_OFFSET + 2
-
-#****************************************************************************
-# Builtin color schemes
 
 Undefined = object()
 
@@ -350,3 +346,6 @@ class Parser(Colorable):
         """ Token handler, with syntax highlighting."""
         self.out.write(
             self._inner_call_(toktype, toktext, start_pos))
+
+# This is just for compatibility and does not have the user colors 
+ANSICodeColors = Parser().ANSICodeColors
