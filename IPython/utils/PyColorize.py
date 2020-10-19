@@ -347,5 +347,6 @@ class Parser(Colorable):
         self.out.write(
             self._inner_call_(toktype, toktext, start_pos))
 
-# This is just for compatibility and does not have the user colors 
+
+# This is just for compatibility and does not have the user colors
 ANSICodeColors = Parser().ANSICodeColors

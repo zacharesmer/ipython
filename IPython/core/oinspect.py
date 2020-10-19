@@ -352,12 +352,15 @@ def find_source_lines(obj):
     return lineno
 
 class Inspector(Colorable):
-
-    def __init__(self, color_table=InspectColors,
-                 code_color_table=InspectColors,
-                 scheme=None,
-                 str_detail_level=0,
-                 parent=None, config=None):
+    def __init__(
+        self,
+        color_table=InspectColors,
+        code_color_table=InspectColors,
+        scheme=None,
+        str_detail_level=0,
+        parent=None,
+        config=None,
+    ):
         super(Inspector, self).__init__(parent=parent, config=config)
         self.color_table = color_table
         self.parser = PyColorize.Parser(out='str', parent=self, style=scheme)
