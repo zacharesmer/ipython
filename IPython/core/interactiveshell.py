@@ -435,7 +435,8 @@ class InteractiveShell(SingletonConfigurable):
     colors = CaselessStrEnum(
         ("Neutral", "NoColor", "LightBG", "Linux", "User"),
         default_value="Neutral",
-        help="Set the color scheme (NoColor, Neutral, Linux, User, or LightBG).",
+        help="Set the color scheme (NoColor, Neutral, Linux, LightBG, or User."
+        "User theme is configured by editing c.TerminalInteractiveShell.user_color_templates.",
     ).tag(config=True)
     debug = Bool(False).tag(config=True)
     disable_failing_post_execute = Bool(False,
